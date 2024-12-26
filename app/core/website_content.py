@@ -30,7 +30,8 @@ class Content():
       # Find all image tags in the content
       images = content.find_all('img')
       # Extract the image URLs from the src attribute
-      image_urls = [img['src'] for img in images]
+      image_urls = [img['src'] for img in images if img.get('src') and img['src'].startswith(('http://', 'https://'))]
+      # print(image_urls)
       return image_urls
     else:
       return None

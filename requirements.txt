@@ -1,5 +1,10 @@
+beautifulsoup4==4.12.3
 certifi==2024.12.14
 charset-normalizer==3.4.0
 idna==3.10
+PyQt6==6.8.0
+PyQt6-Qt6==6.8.1
+PyQt6_sip==13.9.1
 requests==2.32.3
+soupsieve==2.6
 urllib3==2.3.0
