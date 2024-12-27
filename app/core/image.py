@@ -18,6 +18,8 @@ class ImageData:
     
     self.image_data = BytesIO(self.response.content)
     self.image = Image.open(self.image_data)
+    self.format = self.image.format
+    self.filename = self.image_name()
 
   def image_name(self):
     image_name = 'default_name'
@@ -54,4 +56,12 @@ class ImageData:
       return img_byte_arr
     except Exception as e:
       raise ImageDataError(f"Failed to display image: {e}")
+    
+  def save_image(self):
+    try:
+      output_path = f"/home/crowdfrica/Downloads/downloaded_{self.filename}"
+      self.image.save(output_path, format=self.format, quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
+      print(f"Image saved successfully in {output_path}")
+    except Exception as e:
+      raise ImageDataError(f"Failed to save image: {e}")
     

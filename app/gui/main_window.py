@@ -7,9 +7,10 @@ from .images import ImagesWindow
 import os
 
 
-def show_images(url_input, layout):
+def show_images(url_input, layout, search_btn):
   global images_src
   url = url_input.text()
+  search_btn.setDisabled(True)
   try:
     loading_label = QLabel("Loading images...")
     layout.addWidget(loading_label)
@@ -23,6 +24,7 @@ def show_images(url_input, layout):
     show_error_message(str(e))
   finally:
     loading_label.deleteLater()
+    search_btn.setDisabled(False)
 
 def show_error_message(message):
   msg_box = QMessageBox()
@@ -68,7 +70,7 @@ def window():
   
   main_layout = QVBoxLayout()
   main_layout.addWidget(search_box_container)
-  search_btn.clicked.connect(lambda: show_images(url_input, main_layout))
+  search_btn.clicked.connect(lambda: show_images(url_input, main_layout, search_btn))
   main_layout.addStretch()
 
   win.setLayout(main_layout)
