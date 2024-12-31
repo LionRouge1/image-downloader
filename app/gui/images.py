@@ -17,6 +17,11 @@ def download_all_images(urls):
   msg_box.setWindowTitle("Download Complete")
   msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
   msg_box.exec()
+
+def save_image_fn(url):
+  print(url)
+  img = ImageData(url)
+  return img.save_image()
     
 
 class ImagesWindow(QWidget):
@@ -30,12 +35,18 @@ class ImagesWindow(QWidget):
     download_all.setStyleSheet("background: green; color: white")
     download_all.setCursor(Qt.CursorShape.PointingHandCursor)
 
+    clear_button = QPushButton("Clear")
+    clear_button.setStyleSheet("background: red; color: white")
+    clear_button.setCursor(Qt.CursorShape.PointingHandCursor)
+    clear_button.clicked.connect(lambda: self.close())
+
     f_widget = QWidget()
     f_layout = QHBoxLayout()
     f_widget.setLayout(f_layout)
     f_layout.addStretch()
     f_layout.addWidget(self.label)
     f_layout.addWidget(download_all)
+    f_layout.addWidget(clear_button)
 
     layout = QVBoxLayout()
     layout.addStretch()
@@ -98,11 +109,6 @@ class ImagesWindow(QWidget):
       )
       details_label.setVisible(False)
       image_box_layout.addWidget(details_label)
-
-      def save_image_fn(url):
-        print(url)
-        img = ImageData(url)
-        return img.save_image()
 
       def create_toggle_details_fn(label, button):
         visibility_state = False
