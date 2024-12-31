@@ -1,9 +1,17 @@
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
+from PyQt6.QtCore import Qt
 from ..core.website_content import Content
 from .image import ImageWidget
+from .utils import show_success_message
 
-from PyQt6.QtWidgets import *
+from PyQt6.QtWidgets import (
+  QWidget,
+  QLabel,
+  QPushButton,
+  QVBoxLayout,
+  QHBoxLayout,
+  QScrollArea,
+  QGridLayout
+)
 
 class ImagesWindow(QWidget):
   def __init__(self, url):
@@ -38,11 +46,9 @@ class ImagesWindow(QWidget):
     scroll_area = QScrollArea()
     scroll_area.setMinimumHeight(500)
     scroll_area.setWidgetResizable(True)
-    # scroll_area.setStyleSheet("background: white; border: 1px solid black; border-radius: 5px; padding: 10px")
 
     images_widget = QWidget()
     scroll_area.setWidget(images_widget)
-    # images_widget.setStyleSheet("background: white; border: 1px solid black; border-radius: 5px; padding: 10px")
 
     web_content = Content(url)
     images_url = web_content.get_images()
@@ -65,10 +71,5 @@ class ImagesWindow(QWidget):
   def download_all_images(self):
     for image in self.images:
       image.save_image()
-
-    msg_box = QMessageBox()
-    msg_box.setIcon(QMessageBox.Icon.Information)
-    msg_box.setText("All images have been successfully downloaded.")
-    msg_box.setWindowTitle("Download Complete")
-    msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
-    msg_box.exec()
+    
+    show_success_message('All images have been successfully downloaded.')

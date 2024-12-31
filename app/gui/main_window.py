@@ -1,11 +1,9 @@
 import sys
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import QRegularExpression, Qt
-from PyQt6.QtGui import QRegularExpressionValidator, QIcon, QPixmap
-from ..core.website_content import Content
+from PyQt6.QtCore import QRegularExpression
+from PyQt6.QtGui import QRegularExpressionValidator, QIcon
 from .images import ImagesWindow
-import os
-
+from .utils import show_error_message
 
 def show_images(url_input, layout, search_btn):
   global images_src
@@ -25,14 +23,6 @@ def show_images(url_input, layout, search_btn):
   finally:
     loading_label.deleteLater()
     search_btn.setDisabled(False)
-
-def show_error_message(message):
-  msg_box = QMessageBox()
-  msg_box.setIcon(QMessageBox.Icon.Critical)
-  msg_box.setText("Error")
-  msg_box.setInformativeText(message)
-  msg_box.setWindowTitle("Error")
-  msg_box.exec()
 
 def window():
   app = QApplication(sys.argv)

@@ -1,8 +1,15 @@
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPixmap
 from ..core.image import ImageData
+from .utils import show_success_message
 
-from PyQt6.QtWidgets import *
+from PyQt6.QtWidgets import (
+  QWidget,
+  QLabel,
+  QPushButton,
+  QVBoxLayout,
+  QHBoxLayout
+)
 
 class ImageWidget(QWidget):
   def __init__(self, url):
@@ -52,10 +59,5 @@ class ImageWidget(QWidget):
   def save_image(self):
     self.image.save_image()
 
-    msg_box = QMessageBox()
-    msg_box.setIcon(QMessageBox.Icon.Information)
-    msg_box.setText("Image has been successfully downloaded.")
-    msg_box.setWindowTitle("Download Complete")
-    msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
-    msg_box.exec()
+    show_success_message("Image has been successfully downloaded.")
 
