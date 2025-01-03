@@ -1,74 +1,59 @@
-import sys
-from PyQt6.QtWidgets import *
 from PyQt6.QtCore import QRegularExpression
-from PyQt6.QtGui import QRegularExpressionValidator, QIcon
+from PyQt6.QtGui import QRegularExpressionValidator
+from PyQt6.QtWidgets import (
+  QLineEdit,
+  QWidget,
+  QLabel,
+  QPushButton,
+  QVBoxLayout,
+  QHBoxLayout
+)
 from .images import ImagesWindow
-from .utils import show_error_message
 
-def show_images(url_input, layout, search_btn):
-  global images_src
-  url = url_input.text()
-  search_btn.setDisabled(True)
-  try:
-    loading_label = QLabel("Loading images...")
-    layout.addWidget(loading_label)
-    QApplication.processEvents()
+class HomeWindow(QWidget):
+  def __init__(self):
+    super().__init__()
+    self.main_layout = QVBoxLayout()
+    self.setLayout(self.main_layout)
 
-    images = ImagesWindow(url)
-    layout.addWidget(images)
+    search_label = QLabel("Enter Website URL:")
+    self.url_input = QLineEdit()
+    url_regex = QRegularExpression(r"^(https?|ftp)://[^\s/$.?#].[^\s]*$")
+    validator = QRegularExpressionValidator(url_regex, self.url_input)
+    self.url_input.setValidator(validator)
+    self.url_input.setPlaceholderText("https://www.example.com")
+    self.url_input.setStyleSheet("height: 20px; padding: 10px")
+    self.url_input.setMaximumWidth(400)
 
-  except Exception as e:
-    print("Error:", e)
-    show_error_message(str(e))
-  finally:
-    loading_label.deleteLater()
-    search_btn.setDisabled(False)
+    self.search_btn = QPushButton("Search")
+    self.search_btn.setStyleSheet("height: 20px; padding: 10px")
 
-def window():
-  app = QApplication(sys.argv)
-  win = QWidget()
+    search_layout = QHBoxLayout()
+    search_layout.addWidget(search_label)
+    search_layout.addWidget(self.url_input)
+    search_layout.addWidget(self.search_btn)
+    search_layout.addStretch()
 
-  icon_path = "/home/crowdfrica/Matchoudi/image-downloader/app/gui/assets/logo.png"
-  icon = QIcon(icon_path)
-  win.setWindowIcon(icon)
+    search_widget = QWidget()
+    search_widget.setLayout(search_layout)
+    search_widget.setMaximumWidth(600)
 
-  label = QLabel("Enter Website URL:")
-  url_input = QLineEdit()
-  url_regex = QRegularExpression(r"^(https?|ftp)://[^\s/$.?#].[^\s]*$")
-  validator = QRegularExpressionValidator(url_regex, url_input)
-  url_input.setValidator(validator)
-  url_input.setPlaceholderText("https://www.example.com")
-  url_input.setStyleSheet("height: 20px; padding: 10px")
-  url_input.setMaximumWidth(400)
+    self.main_layout.addWidget(search_widget)
+    self.search_btn.clicked.connect(self.show_images)
+    self.main_layout.addStretch()
+    self.setStyleSheet("font-size: 16px; font-family: Arial;")
+    
 
-  search_btn = QPushButton("Search")
-  search_btn.setStyleSheet("height: 20px; padding: 10px")
+  def show_images(self):
+    url = self.url_input.text()
+    self.search_btn.setDisabled(True)
+    try:
 
-  search_box = QHBoxLayout()
-  search_box.addWidget(label)
-  search_box.addWidget(url_input)
-  search_box.addWidget(search_btn)
+      images = ImagesWindow(url)
+      self.main_layout.addWidget(images)
 
-  search_box_container = QWidget()
-  search_box_container.setLayout(search_box)
-  search_box_container.setMaximumWidth(600)
-
-  center_layout = QHBoxLayout()
-  center_layout.addStretch()
-  center_layout.addWidget(search_box_container)
-  center_layout.addStretch()
-  
-  main_layout = QVBoxLayout()
-  main_layout.addWidget(search_box_container)
-  search_btn.clicked.connect(lambda: show_images(url_input, main_layout, search_btn))
-  main_layout.addStretch()
-
-  win.setLayout(main_layout)
-  win.setStyleSheet("font-size: 16px; font-family: Arial;")
-  win.setMinimumWidth(700)
-  win.setWindowTitle("Images Downloader")
-  win.show()
-  sys.exit(app.exec())
-
-if __name__ == "__main__":
-  window()
+    except Exception as e:
+      print("Error:", e)
+    finally:
+      self.search_btn.setDisabled(False)
+      self.url_input.clear()
