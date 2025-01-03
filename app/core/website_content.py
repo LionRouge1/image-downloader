@@ -53,40 +53,37 @@ class Content():
 
       css_files = content.find_all('link', rel='stylesheet')
       for css_file in css_files:
-                css_url = self.reconstruct_url(css_file['href'])
-                css_content = self.get_css_content(css_url)
-                if css_content:
-                    css_image_urls = self.extract_image_urls_from_css(css_content, css_url)
-                    image_urls.extend(css_image_urls)
+        css_url = self.reconstruct_url(css_file['href'])
+        css_content = self.get_css_content(css_url)
+        if css_content:
+          css_image_urls = self.extract_image_urls_from_css(css_content, css_url)
+          image_urls.extend(css_image_urls)
       return image_urls
     else:
       return None
     
   def get_css_content(self, css_url):
-        try:
-            response = requests.get(css_url)
-            response.raise_for_status()
-            return response.text
-        except requests.RequestException as e:
-            print(f"Failed to retrieve CSS content: {e}")
-            return None
+    try:
+      response = requests.get(css_url)
+      response.raise_for_status()
+      return response.text
+    except requests.RequestException as e:
+      print(f"Failed to retrieve CSS content: {e}")
+      return None
 
   def extract_image_urls_from_css(self, css_content, css_url):
-        # Regular expression to find URLs in CSS content
-        url_pattern = re.compile(r'background-image:\s*url\((.*?)\)')
-        matches = url_pattern.findall(css_content)
-        image_urls = []
-        for match in matches:
-            # Remove quotes and whitespace
-            match = match.strip('\'" ')
-            # Reconstruct the full URL
-            full_url = urljoin(css_url, match)
-            if self.is_valid_url(full_url):
-              image_urls.append(full_url)
-        return image_urls
+    # Regular expression to find URLs in CSS content
+    url_pattern = re.compile(r'background-image:\s*url\((.*?)\)')
+    matches = url_pattern.findall(css_content)
+    image_urls = []
+    for match in matches:
+      # Remove quotes and whitespace
+      match = match.strip('\'" ')
+      # Reconstruct the full URL
+      full_url = urljoin(css_url, match)
+      if self.is_valid_url(full_url):
+        image_urls.append(full_url)
+    return image_urls
     
   def __str__(self):
     return self.url
-  
-web = Content("https://crowdfrica.org/")
-print(web.get_images())

@@ -2,6 +2,7 @@ import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, QLabel, QWidget
 from PyQt6.QtGui import QIcon
 from app.gui.main_window import HomeWindow
+from app.gui.setting import SettingsUI
 
 # Define the main application window with tabs
 class MainWindow(QMainWindow):
@@ -20,21 +21,10 @@ class MainWindow(QMainWindow):
     # Create and add tabs
     self.tabs.addTab(HomeWindow(), "Home")
     self.tabs.addTab(AboutWindow(), "About")
-    self.tabs.addTab(SettingsWindow(), "Settings")
+    self.tabs.addTab(SettingsUI(), "Settings")
 
         # Set the QTabWidget as the central widget
     self.setCentralWidget(self.tabs)
-
-
-# Define the home window
-# class HomeWindow(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         layout = QVBoxLayout()
-#         label = QLabel("Welcome to the Home Page!")
-#         layout.addWidget(label)
-#         self.setLayout(layout)
-
 
 # Define the about window
 class AboutWindow(QWidget):
