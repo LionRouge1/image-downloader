@@ -1,7 +1,9 @@
 import requests
+from urllib.parse import urlparse
 from io import BytesIO
 from PIL import Image
 from decimal import Decimal
+import cairosvg
 import re
 
 class ImageDataError(Exception):
@@ -10,24 +12,44 @@ class ImageDataError(Exception):
 class ImageData:
   def __init__(self, url):
     self.url = url
+    self.path = urlparse(url).path
+    self.scheme = urlparse(url).scheme
+
     try:
-      self.response = requests.get(url)
+      headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+      self.response = requests.get(url, headers=headers)
       self.response.raise_for_status
     except requests.RequestException as e:
       raise ImageDataError(f"Failed to fetch image from URL: {e}")
     
     self.image_data = BytesIO(self.response.content)
-    self.image = Image.open(self.image_data)
-    self.format = self.image.format
-    self.filename = self.image_name()
+    if self.path.lower().endswith('.svg'):
+      self.format = 'SVG'
+      self.size = "N/A"
+      self.mode = "N/A"
+      self.filename = self.image_name()
+      self.image_data.seek(0)
+      self.image = self.image_data.read()
+    else:
+      self.image = Image.open(self.image_data)
+      self.format = self.image.format
+      self.filename = self.image_name()
+      self.size = self.image.size,
+      self.mode = self.image.mode,
+
+  def is_valid_image_name(self, name):
+    return bool(re.match(r"^[\w\s_()-]+\.[A-Za-z]{3,4}$", name))
 
   def image_name(self):
     image_name = 'default_name'
     content_disposition = self.response.headers.get('Content-Disposition')
+    # print(content_disposition, "\n")
     if content_disposition:
       filename = re.findall('filename="(.+)"', content_disposition)
       if filename:
         image_name = filename[0]
+    elif self.is_valid_image_name(self.path.split('/')[-1]):
+      image_name = self.url.split('/')[-1]
     return image_name
   
   def get_file_size(self):
@@ -37,19 +59,24 @@ class ImageData:
   
   def image_properties(self):
     return {
-      "format": self.image.format,
-      "size": self.image.size,
-      "filename": self.image_name(),
-      "mode": self.image.mode,
-      "file_size": self.get_file_size(),
-      "info": self.image.info
+      "format": self.format,
+      "size": self.size,
+      "filename": self.filename,
+      "mode": self.mode,
+      "file_size": self.get_file_size()
     }
   
   def display_image(self):
     try:
-      img = self.image.resize((200, 200), Image.NEAREST)  # Use Image.LANCZOS instead of Image.ANTIALIAS
+      if self.format == 'SVG':
+        png_data = cairosvg.svg2png(bytestring=self.image)
+        img = Image.open(BytesIO(png_data))
+      else:
+        img = self.image
+
+      img = img.resize((200, 200), Image.NEAREST)  # Use Image.LANCZOS instead of Image.ANTIALIAS
       img_byte_arr = BytesIO()
-      format = self.image_properties()['format']
+      format = 'PNG' if self.format == 'SVG' else self.format
       img.save(img_byte_arr, format=format)
       img_byte_arr = img_byte_arr.getvalue()
 
@@ -60,8 +87,15 @@ class ImageData:
   def save_image(self):
     try:
       output_path = f"/home/crowdfrica/Downloads/downloaded_{self.filename}"
-      self.image.save(output_path, format=self.format, quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
+      if self.format == 'SVG':
+        with open(output_path, 'wb') as f:
+          f.write(self.image_data.getvalue())
+      else:
+        self.image.save(output_path, format=self.format, quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
+    
       print(f"Image saved successfully in {output_path}")
     except Exception as e:
       raise ImageDataError(f"Failed to save image: {e}")
     
+# image = ImageData("https://www.crowdfrica.org/assets/arcticons_easyconnect-68acd04ceb9c1e2a6297d1e0a0435f6e511e1feef0ee3bc334962f7b392a08db.svg")
+# print(image.image_properties())

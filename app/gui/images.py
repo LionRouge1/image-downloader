@@ -91,9 +91,12 @@ class ImagesWindow(QWidget):
   def display_images(self, images_url):
     row, col = 0, 0
     for url in images_url:
-      image_widget = ImageWidget(url)
-      self.images.append(image_widget.image)
-      self.grid_layout.addWidget(image_widget, row, col)
+      try:
+        image_widget = ImageWidget(url)
+        self.images.append(image_widget.image)
+        self.grid_layout.addWidget(image_widget, row, col)
+      except Exception as e:
+        show_error_message(f"Failed to load image from {url}: {e}")
 
       col += 1
       if col == 5:
