@@ -20,16 +20,16 @@ class Spinner(QWidget):
     self.update()  # Trigger a repaint
 
   def paintEvent(self, event):
-    painter = QPainter(self)
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+    with QPainter(self) as painter:
+      painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-    # Draw the spinner
-    pen = QPen()
-    pen.setWidth(5)
-    pen.setColor(Qt.GlobalColor.darkYellow)
-    pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-    painter.setPen(pen)
-    painter.translate(self.width() // 2, self.height() // 2)
-    painter.rotate(self.angle)
+      # Draw the spinner
+      pen = QPen()
+      pen.setWidth(5)
+      pen.setColor(Qt.GlobalColor.darkYellow)
+      pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+      painter.setPen(pen)
+      painter.translate(self.width() // 2, self.height() // 2)
+      painter.rotate(self.angle)
 
-    painter.drawLine(0, 0, 15, 0)
+      painter.drawLine(0, 0, 15, 0)

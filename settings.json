@@ -1,6 +1,6 @@
 {
-  "save_directory": "/home/crowdfrica/Documents",
+  "save_directory": "/home/crowdfrica/Downloads",
   "image_format": "",
-  "max_images": "70",
-  "get_css_images": false
+  "max_images": "30",
+  "get_css_images": true
 }

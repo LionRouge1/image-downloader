@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import (
 
 class ImagesLoaderThread(QThread):
   urls_loaded = pyqtSignal(list)
+  error_occurred = pyqtSignal(str)
 
   def __init__(self, url):
     super().__init__()
@@ -25,9 +26,14 @@ class ImagesLoaderThread(QThread):
     try:
       web_content = Content(self.url)
       images_url = web_content.get_images()
-      self.urls_loaded.emit(images_url)
+      print(images_url)
+      if images_url:
+        self.urls_loaded.emit(images_url)
+      else:
+        self.error_occurred.emit("No images found on the website.")
     except Exception as e:
-      show_error_message(f"Failed to load images: {e}")
+      # show_error_message(f"Failed to load images: {e}")
+      self.error_occurred.emit(f"Failed to load images: {e}")
 
 class ImagesWindow(QWidget):
   def __init__(self, url):
@@ -81,7 +87,9 @@ class ImagesWindow(QWidget):
 
     self.thread = ImagesLoaderThread(url)
     self.thread.urls_loaded.connect(self.display_images)
+    self.thread.error_occurred.connect(self.display_error_message)
     self.thread.start()
+    self.thread.finished.connect(lambda: self.loading_widget.hide())
 
     self.grid_layout = QGridLayout()
     self.images_widget.setLayout(self.grid_layout)
@@ -90,6 +98,7 @@ class ImagesWindow(QWidget):
   
   def display_images(self, images_url):
     row, col = 0, 0
+    print(images_url)
     for url in images_url:
       try:
         image_widget = ImageWidget(url)
@@ -103,7 +112,12 @@ class ImagesWindow(QWidget):
         row += 1
         col = 0
     
-    self.loading_widget.hide()
+  def display_error_message(self, message):
+    self.label.setText('')
+    error_label = QLabel(message)
+    error_label.setWordWrap(True)
+    error_label.setStyleSheet('color: red')
+    self.grid_layout.addWidget(error_label, 0, 0)
 
   def download_all_images(self):
     self.download_all.setDisabled(True)

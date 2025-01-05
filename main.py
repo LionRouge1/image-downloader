@@ -9,7 +9,7 @@ class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
     self.setWindowTitle("Image Downloader")
-    self.setGeometry(100, 100, 800, 600)
+    # self.setGeometry(100, 100, 800, 600)
 
     icon_path = "/home/crowdfrica/Matchoudi/image-downloader/app/gui/assets/logo.png"
     icon = QIcon(icon_path)
