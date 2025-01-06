@@ -1,5 +1,6 @@
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from ..core.website_content import Content
+from ..core.history import History
 from PyQt6.QtWidgets import (
   QWidget,
   QLabel,
@@ -38,6 +39,7 @@ class ImagesWindow(QWidget):
   def __init__(self, url):
     super().__init__()
     self.url = url
+    # self.history = History()
     self.images = []
     self.label = QLabel("Here are the images from the website:")
     self.download_all = QPushButton("Download All")
@@ -92,18 +94,18 @@ class ImagesWindow(QWidget):
     self.grid_layout = QGridLayout()
     self.images_widget.setLayout(self.grid_layout)
     layout.addWidget(scroll_area)
-
   
   def display_images(self, images_url):
     row, col = 0, 0
     for url in images_url:
       image_widget = ImageWidget(url, self)
       self.grid_layout.addWidget(image_widget, row, col)
-
       col += 1
       if col == 5:
         row += 1
         col = 0
+
+    self.history.add_to_history(self.url, self.images)
 
   def display_error_message(self, message):
     self.label.setText('')

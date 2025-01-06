@@ -6,7 +6,7 @@ from decimal import Decimal
 import cairosvg
 import re
 import os
-from .setting import Settings
+from .setting import load_settings
 
 class ImageDataError(Exception):
   pass
@@ -14,7 +14,6 @@ class ImageDataError(Exception):
 class ImageData:
   def __init__(self, url):
     self.url = url
-    self.output_directory = Settings().save_directory
     self.path = urlparse(url).path
     self.scheme = urlparse(url).scheme
 
@@ -86,9 +85,10 @@ class ImageData:
     
   def save_image(self):
     try:
-      if not os.path.exists(self.output_directory):
-        os.makedirs(self.output_directory, exist_ok=True)
-      output_path = os.path.join(self.output_directory, self.filename)
+      file_directory = load_settings()['save_directory']
+      if not os.path.exists(file_directory):
+        os.makedirs(file_directory, exist_ok=True)
+      output_path = os.path.join(file_directory, self.filename)
       if self.format == 'SVG':
         with open(output_path, 'wb') as f:
           f.write(self.image_data.getvalue())

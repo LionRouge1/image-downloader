@@ -18,22 +18,22 @@ def show_error_message(message):
   msg_box.exec()
 
 class CustomErrorDialog(QDialog):
-    def __init__(self, message, parent=None):
-      super().__init__(parent)
-      self.setWindowTitle("Error")
-      self.setFixedSize(300, 150)
+  def __init__(self, message, parent=None):
+    super().__init__(parent)
+    self.setWindowTitle("Error")
+    self.setFixedSize(300, 150)
       
-      layout = QVBoxLayout()
+    layout = QVBoxLayout()
       
-      self.label = QLabel(message)
-      layout.addWidget(self.label)
+    self.label = QLabel(message)
+    layout.addWidget(self.label)
       
-      self.close_button = QPushButton("Close")
-      self.close_button.clicked.connect(self.close)
-      layout.addWidget(self.close_button)
+    self.close_button = QPushButton("Close")
+    self.close_button.clicked.connect(self.close)
+    layout.addWidget(self.close_button)
       
-      self.setLayout(layout)
+    self.setLayout(layout)
 
 def show_custom_error_message(message):
-    dialog = CustomErrorDialog(message)
-    dialog.exec()
+  dialog = CustomErrorDialog(message)
+  dialog.exec()

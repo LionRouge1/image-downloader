@@ -2,14 +2,14 @@ import requests
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import re
-from .setting import Settings
+from .setting import load_settings
 
 class Content():
   def __init__(self, url):
     self.url = url
     self.image_urls = []
-    self.settings = Settings()
-    self.max_images = int(self.settings.max_images)
+    self.settings = load_settings()
+    self.max_images = int(self.settings['max_images'])
     self.scheme = urlparse(url).scheme
     self.netloc = urlparse(url).netloc
     self.path = urlparse(url).path
@@ -39,7 +39,7 @@ class Content():
       images = content.find_all('img')[:self.max_images]
       self.image_urls = [self.reconstruct_url(img['src']) for img in images if img.get('src')]
 
-      if self.settings.get_css_images and len(self.image_urls) < self.max_images:
+      if self.settings['get_css_images'] and len(self.image_urls) < self.max_images:
         css_files = content.find_all('link', rel='stylesheet')
         for css_file in css_files:
           css_url = self.reconstruct_url(css_file['href'])

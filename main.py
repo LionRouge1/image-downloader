@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, 
 from PyQt6.QtGui import QIcon
 from app.gui.main_window import HomeWindow
 from app.gui.setting import SettingsUI
+from app.gui.history import HistoryUI
 
 # Define the main application window with tabs
 class MainWindow(QMainWindow):
@@ -22,8 +23,9 @@ class MainWindow(QMainWindow):
     self.tabs.addTab(HomeWindow(), "Home")
     self.tabs.addTab(AboutWindow(), "About")
     self.tabs.addTab(SettingsUI(), "Settings")
+    self.tabs.addTab(HistoryUI(), "History")
 
-        # Set the QTabWidget as the central widget
+    # Set the QTabWidget as the central widget
     self.setCentralWidget(self.tabs)
 
 # Define the about window

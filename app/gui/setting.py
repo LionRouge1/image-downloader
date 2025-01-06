@@ -4,12 +4,12 @@ from PyQt6.QtGui import QIntValidator
 from PyQt6.QtWidgets import (
   QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QFileDialog, QGridLayout
 )
-from ..core.setting import Settings
+from ..core.setting import save_settings, load_settings
 
 class SettingsUI(QWidget):
   def __init__(self):
     super().__init__()
-    self.settings = Settings()
+    self.settings = load_settings()
     layout = QVBoxLayout()
     layout.addStretch()
     self.setLayout(layout)
@@ -23,7 +23,7 @@ class SettingsUI(QWidget):
 
     self.dir_line_edit = QLineEdit(self)
     params_layout.addWidget(self.dir_line_edit, 0, 1)
-    self.dir_line_edit.setText(self.settings.save_directory)
+    self.dir_line_edit.setText(self.settings['save_directory'])
     self.dir_line_edit.setReadOnly(True)
 
     self.dir_button = QPushButton('Browse', self)
@@ -36,8 +36,9 @@ class SettingsUI(QWidget):
     params_layout.addWidget(self.max_image_label, 1, 0)
 
     self.max_image_line_edit = QLineEdit(self)
-    self.max_image_line_edit.setValidator(QIntValidator(0, 999, self))
-    self.max_image_line_edit.setText(str(self.settings.max_images))
+    self.max_image_line_edit.setValidator(QIntValidator(2, 999, self))
+    self.max_image_line_edit.setText(str(self.settings['max_images']))
+    self.max_image_line_edit.textChanged.connect(self.save_setting)
     params_layout.addWidget(self.max_image_line_edit, 1, 1)
 
     self.max_image_description_label = QLabel('Specify the maximum number of images to download per request.')
@@ -54,13 +55,14 @@ class SettingsUI(QWidget):
     params_layout.addWidget(self.enable_css_images_label, 3, 0)
     
     self.css_checkbox = QCheckBox(self)
-    self.css_checkbox.setChecked(self.settings.get_css_images)
+    self.css_checkbox.setChecked(self.settings['get_css_images'])
     self.css_checkbox.setStyleSheet('''
       QCheckBox::indicator {
       width: 15px;
       height: 15px;
       };
     ''')
+    self.css_checkbox.stateChanged.connect(self.save_setting)
     params_layout.addWidget(self.css_checkbox, 3, 1)
 
     # Description for CSS images checkbox
@@ -84,13 +86,14 @@ class SettingsUI(QWidget):
     directory = QFileDialog.getExistingDirectory(self, 'Select Directory')
     if directory:
       self.dir_line_edit.setText(directory)
+      self.save_setting()
 
   def save_setting(self):
     directory = self.dir_line_edit.text()
     max = self.max_image_line_edit.text()
     get_css = self.css_checkbox.isChecked()
 
-    self.settings.save_settings(directory, max, get_css)
+    save_settings(directory, max, get_css)
 
 if __name__ == '__main__':
   app = QApplication(sys.argv)
