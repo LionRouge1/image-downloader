@@ -1,11 +1,8 @@
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
-from ..core.website_content import Content
+from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import (
   QWidget,
   QLabel,
-  QPushButton,
   QVBoxLayout,
-  QHBoxLayout,
   QScrollArea,
   QGridLayout
 )
@@ -22,7 +19,6 @@ class HistoryLoaderThread(QThread):
     try:
       history = History()
       self.history_loaded.emit(history)
-      # print(history.history)
     except Exception as e:
       self.error_occurred.emit(f"Failed to load History: {e}")
 
@@ -49,7 +45,6 @@ class HistoryUI(QWidget):
     self.main_layout.addWidget(scroll_area)
 
   def populate_history(self, history):
-    print(history.history)
     for index, item in enumerate(history.history):
       url_label = QLabel(item['url'])
       date_label = QLabel(item['timestamp'])

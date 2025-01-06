@@ -39,7 +39,7 @@ class ImagesWindow(QWidget):
   def __init__(self, url):
     super().__init__()
     self.url = url
-    # self.history = History()
+    self.history = History()
     self.images = []
     self.label = QLabel("Here are the images from the website:")
     self.download_all = QPushButton("Download All")
@@ -105,7 +105,7 @@ class ImagesWindow(QWidget):
         row += 1
         col = 0
 
-    self.history.add_to_history(self.url, self.images)
+    self.history.add_to_history(self.url, images_url)
 
   def display_error_message(self, message):
     self.label.setText('')
