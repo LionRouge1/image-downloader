@@ -2,10 +2,14 @@ import requests
 from urllib.parse import urlparse, urljoin
 from bs4 import BeautifulSoup
 import re
+from .setting import Settings
 
 class Content():
   def __init__(self, url):
     self.url = url
+    self.image_urls = []
+    self.settings = Settings()
+    self.max_images = int(self.settings.max_images)
     self.scheme = urlparse(url).scheme
     self.netloc = urlparse(url).netloc
     self.path = urlparse(url).path
@@ -14,22 +18,9 @@ class Content():
   def get_content(self):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
     response = requests.get(self.url, headers=headers)
-    response.raise_for_status()  # Raise an exception for HTTP errors
-      
-      # Return the content of the response
-    print("Content got successfully")
+    response.raise_for_status()
+
     return BeautifulSoup(response.text, 'html.parser')
-    # try:
-    #   # Send a GET request to the URL
-    #   response = requests.get(self.url)
-    #   response.raise_for_status()  # Raise an exception for HTTP errors
-      
-    #   # Return the content of the response
-    #   print("Content got successfully")
-    #   return BeautifulSoup(response.text, 'html.parser')
-    # except requests.exceptions.RequestException as e:
-    #   print(f"Failed to retrieve content: {e}")
-    #   return None
 
   def reconstruct_url(self, src):
     if src.startswith('//'):
@@ -45,20 +36,18 @@ class Content():
   def get_images(self):
     content = self.get_content()
     if content:
-      # Find all image tags in the content
-      images = content.find_all('img')
-      # Extract the image URLs from the src attribute
-      image_urls = [self.reconstruct_url(img['src']) for img in images if img.get('src')]
-      # print(image_urls)
+      images = content.find_all('img')[:self.max_images]
+      self.image_urls = [self.reconstruct_url(img['src']) for img in images if img.get('src')]
 
-      css_files = content.find_all('link', rel='stylesheet')
-      for css_file in css_files:
-        css_url = self.reconstruct_url(css_file['href'])
-        css_content = self.get_css_content(css_url)
-        if css_content:
-          css_image_urls = self.extract_image_urls_from_css(css_content, css_url)
-          image_urls.extend(css_image_urls)
-      return image_urls
+      if self.settings.get_css_images and len(self.image_urls) < self.max_images:
+        css_files = content.find_all('link', rel='stylesheet')
+        for css_file in css_files:
+          css_url = self.reconstruct_url(css_file['href'])
+          css_content = self.get_css_content(css_url)
+          if css_content:
+            self.extract_image_urls_from_css(css_content, css_url)
+      
+      return self.image_urls
     else:
       return None
     
@@ -72,18 +61,18 @@ class Content():
       return None
 
   def extract_image_urls_from_css(self, css_content, css_url):
-    # Regular expression to find URLs in CSS content
     url_pattern = re.compile(r'background-image:\s*url\((.*?)\)')
     matches = url_pattern.findall(css_content)
-    image_urls = []
+
     for match in matches:
-      # Remove quotes and whitespace
+      if len(self.image_urls) >= self.max_images:
+        break
+
       match = match.strip('\'" ')
-      # Reconstruct the full URL
       full_url = urljoin(css_url, match)
+
       if self.is_valid_url(full_url):
-        image_urls.append(full_url)
-    return image_urls
+        self.image_urls.append(full_url)
     
   def __str__(self):
     return self.url

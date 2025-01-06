@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
   QHBoxLayout
 )
 from .images import ImagesWindow
+from .utils import show_error_message
 
 class HomeWindow(QWidget):
   def __init__(self):
@@ -54,6 +55,7 @@ class HomeWindow(QWidget):
 
     except Exception as e:
       print("Error:", e)
+      show_error_message(str(e))
     finally:
       self.search_btn.setDisabled(False)
       self.url_input.clear()

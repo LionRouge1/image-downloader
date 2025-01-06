@@ -1,9 +1,5 @@
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from ..core.website_content import Content
-from .image import ImageWidget
-from .utils import show_success_message, show_error_message
-from .animation import Spinner 
-
 from PyQt6.QtWidgets import (
   QWidget,
   QLabel,
@@ -13,6 +9,9 @@ from PyQt6.QtWidgets import (
   QScrollArea,
   QGridLayout
 )
+from .image import ImageWidget
+from .utils import show_success_message, show_error_message
+from .animation import Spinner 
 
 class ImagesLoaderThread(QThread):
   urls_loaded = pyqtSignal(list)
@@ -26,19 +25,19 @@ class ImagesLoaderThread(QThread):
     try:
       web_content = Content(self.url)
       images_url = web_content.get_images()
-      print(images_url)
+
       if images_url:
         self.urls_loaded.emit(images_url)
       else:
         self.error_occurred.emit("No images found on the website.")
     except Exception as e:
       # show_error_message(f"Failed to load images: {e}")
-      self.error_occurred.emit(f"Failed to load images: {e}")
+      self.error_occurred.emit(f"Failed to load Website content: {e}")
 
 class ImagesWindow(QWidget):
   def __init__(self, url):
     super().__init__()
-
+    self.url = url
     self.images = []
     self.label = QLabel("Here are the images from the website:")
     self.download_all = QPushButton("Download All")
@@ -83,7 +82,6 @@ class ImagesWindow(QWidget):
     self.loading_layout.addWidget(loading_label)
 
     layout.addWidget(self.loading_widget)
-    # self.loading_widget.hide()
 
     self.thread = ImagesLoaderThread(url)
     self.thread.urls_loaded.connect(self.display_images)
@@ -98,20 +96,15 @@ class ImagesWindow(QWidget):
   
   def display_images(self, images_url):
     row, col = 0, 0
-    print(images_url)
     for url in images_url:
-      try:
-        image_widget = ImageWidget(url)
-        self.images.append(image_widget.image)
-        self.grid_layout.addWidget(image_widget, row, col)
-      except Exception as e:
-        show_error_message(f"Failed to load image from {url}: {e}")
+      image_widget = ImageWidget(url, self)
+      self.grid_layout.addWidget(image_widget, row, col)
 
       col += 1
       if col == 5:
         row += 1
         col = 0
-    
+
   def display_error_message(self, message):
     self.label.setText('')
     error_label = QLabel(message)
@@ -122,7 +115,8 @@ class ImagesWindow(QWidget):
   def download_all_images(self):
     self.download_all.setDisabled(True)
     for image in self.images:
-      image.save_image()
+      if image:
+        image.save_image()
     
     show_success_message('All images have been successfully downloaded.')
     self.download_all.setDisabled(False)
