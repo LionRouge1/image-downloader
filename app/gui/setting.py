@@ -11,10 +11,11 @@ class SettingsUI(QWidget):
     super().__init__()
     self.settings = load_settings()
     layout = QVBoxLayout()
-    layout.addStretch()
+    # layout.addStretch()
     self.setLayout(layout)
     self.params_widget = QWidget()
     params_layout = QGridLayout()
+    params_layout.setSpacing(10)
     self.params_widget.setLayout(params_layout)
 
     # Directory selection
