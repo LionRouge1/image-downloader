@@ -20,22 +20,27 @@ class ImageData:
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
     self.response = requests.get(url, headers=headers)
     self.response.raise_for_status
+    self.filename = self.image_name()
+    self.image_name_without_extension = self.filename.split('.')[0]
+    self.file_directory = load_settings()['save_directory']
+    # self.output_path = os.path.join(self.file_directory, self.filename)
     
     self.image_data = BytesIO(self.response.content)
     if self.path.lower().endswith('.svg'):
       self.format = 'SVG'
       self.size = "N/A"
       self.mode = "N/A"
-      self.filename = self.image_name()
       self.image_data.seek(0)
       self.image = self.image_data.read()
     else:
       self.image = Image.open(self.image_data)
       self.format = self.image.format
-      self.filename = self.image_name()
       self.size = self.image.size,
       self.mode = self.image.mode,
 
+  def output_path(self, format):
+    return os.path.join(self.file_directory, f"{self.image_name_without_extension}.{format.lower()}")
+  
   def is_valid_image_name(self, name):
     return bool(re.match(r"^[\w\s_()-]+\.[A-Za-z]{3,4}$", name))
 
@@ -65,6 +70,14 @@ class ImageData:
       "file_size": self.get_file_size()
     }
   
+  def save_svg_to_png(self):
+    cairosvg.svg2png(bytestring=self.image, write_to=self.output_path("PNG"))
+
+  def save_svg_to_webp(self):
+    png_data = cairosvg.svg2png(bytestring=self.image)
+    img = Image.open(BytesIO(png_data))
+    img.save(self.output_path("WEBP"), format="WEBP", quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
+
   def display_image(self):
     try:
       if self.format == 'SVG':
@@ -83,18 +96,23 @@ class ImageData:
     except Exception as e:
       raise ImageDataError(f"Failed to display image: {e}")
     
-  def save_image(self):
-    try:
+  def save_image(self, format):
       file_directory = load_settings()['save_directory']
       if not os.path.exists(file_directory):
         os.makedirs(file_directory, exist_ok=True)
       output_path = os.path.join(file_directory, self.filename)
       if self.format == 'SVG':
-        with open(output_path, 'wb') as f:
-          f.write(self.image_data.getvalue())
+        match format:
+          case 'PNG':
+            self.save_svg_to_png()
+          case 'JPEG':
+            self.save_svg_to_jpeg()
+          case 'WEBP':
+            self.save_svg_to_webp()
+          case _:
+            with open(output_path, 'wb') as f:
+              f.write(self.image_data.getvalue())
       else:
-        self.image.save(output_path, format=self.format, quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
-    
-    except Exception as e:
-      raise ImageDataError(f"Failed to save image: {e}")
+        image_format = format or self.format
+        self.image.save(self.output_path(image_format), format=image_format, quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
     

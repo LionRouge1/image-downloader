@@ -5,7 +5,8 @@ from PyQt6.QtWidgets import (
   QLabel,
   QPushButton,
   QVBoxLayout,
-  QHBoxLayout
+  QHBoxLayout,
+  QComboBox
 )
 from ..core.image import ImageData
 from .utils import show_success_message, show_custom_error_message
@@ -50,23 +51,38 @@ class ImageWidget(QWidget):
       self.image_label = QLabel()
       self.image_label.setPixmap(self.pixmap)
       self.image_label.setScaledContents(True)
-      self.toggle_button = QPushButton("Show Details")
+      self.toggle_button = QPushButton("Details")
       self.toggle_button.setCursor(Qt.CursorShape.PointingHandCursor)
-      self.save_button = QPushButton("Save Image")
+      self.save_button = QPushButton("Save")
       self.save_button.setCursor(Qt.CursorShape.PointingHandCursor)
       self.save_button.setStyleSheet("background: green; color: white")
       self.save_button.clicked.connect(self.save_image)
       self.toggle_button.clicked.connect(self.toggle_details)
+
+      self.format_combo = QComboBox()
+
       # self.image_box_layout = QVBoxLayout()
       self.button_widget = QWidget()
       self.button_layout = QHBoxLayout()
       self.button_layout.addStretch()
       self.button_widget.setLayout(self.button_layout)
       self.button_layout.addWidget(self.toggle_button)
+      self.button_layout.addWidget(self.format_combo)
       self.button_layout.addWidget(self.save_button)
 
       self.details_label = QLabel()
       self.image_properties = self.image.image_properties()
+      
+      match self.image_properties['format']:
+        case 'SVG':
+          image_formats = ["SVG", "PNG", "WEBP"]
+        case 'JPEG':
+          image_formats = ["JPEG", "PNG", "WEBP"]
+        case _:
+          image_formats = ["", "PNG", "JPEG", "WEBP"]
+
+      self.format_combo.addItems(image_formats)
+      self.format_combo.setCurrentText(self.image_properties['format'])
       self.details_label.setText(
         f"Image Name: {self.image_properties['filename']}\n"
         f"Image Size: {self.image_properties['size']}\n"
@@ -79,22 +95,23 @@ class ImageWidget(QWidget):
       self.image_box_layout.addWidget(self.details_label)
   
   def on_thread_finished(self, status):
-      self.label = QLabel()
-      self.label.setScaledContents(True)
-      self.label.setWordWrap(True)
-      self.label.setText(
-        f"Failed to load image from: {self.url}"
-      )
-      self.image_box_layout.addWidget(self.label)
+    self.label = QLabel()
+    self.label.setScaledContents(True)
+    self.label.setWordWrap(True)
+    self.label.setText(
+      f"Failed to load image from: {self.url}"
+    )
+    self.image_box_layout.addWidget(self.label)
 
 
   def toggle_details(self):
     self.visibility_state = not self.visibility_state
     self.details_label.setVisible(self.visibility_state)
-    self.toggle_button.setText("Hide Details" if self.visibility_state else "Show Details")
+    self.toggle_button.setText("Hide" if self.visibility_state else "Details")
 
   def save_image(self):
-    self.image.save_image()
+    selected_format = self.format_combo.currentText()
+    self.image.save_image(selected_format)
 
     show_success_message("Image has been successfully downloaded.")
 
