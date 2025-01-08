@@ -41,6 +41,7 @@ class HistoryUI(QWidget):
     self.clear_button = QPushButton("Clear History")
     self.clear_button.clicked.connect(self.clear_history)
     self.clear_button.setStyleSheet("background: red; color: white; padding: 8px")
+    self.clear_button.setCursor(Qt.CursorShape.PointingHandCursor)
     self.main_layout.addWidget(self.clear_button)
 
     scroll_area = QScrollArea()
@@ -55,12 +56,12 @@ class HistoryUI(QWidget):
 
   def populate_history(self, history):
     self.history = history
-    # Clear the form layout before populating to avoid duplicates
+
     while self.form_layout.count():
       child = self.form_layout.takeAt(0)
       if child.widget():
         child.widget().deleteLater()
-    # Add headers for the history
+
     header_widget = QWidget()
     header_layout = QHBoxLayout(header_widget)
     button_style = "font-size: 18px; font-family: Arial; font-weight: bold; padding: 5px; border: 1px solid #ccc;"

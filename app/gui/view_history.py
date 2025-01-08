@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QGridLayout, QLabel, QScrollArea, QPushButton
+from PyQt6.QtCore import Qt
 from .image import ImageWidget
 
 class ViewHistoryUI(QWidget):
@@ -13,9 +14,10 @@ class ViewHistoryUI(QWidget):
     self.tab_widget.setCurrentWidget(self)
     self.main_layout = QVBoxLayout(self)
 
-    close_btn = QPushButton("Close")
+    close_btn = QPushButton("<-- Close")
     close_btn.clicked.connect(self.close_existing_tab)
     close_btn.setStyleSheet("background: red; color: white; padding: 10px")
+    close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
     self.main_layout.addWidget(close_btn)
     
     scroll_area = QScrollArea()
