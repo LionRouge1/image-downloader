@@ -1,13 +1,15 @@
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtWidgets import (
   QWidget,
-  QLabel,
   QVBoxLayout,
   QScrollArea,
   QFormLayout,
-  QGroupBox
+  QGroupBox,
+  QPushButton
 )
 from ..core.history import History
+from .history_item import HistoryItemUI
+from .view_history import ViewHistoryUI
 
 class HistoryLoaderThread(QThread):
   history_loaded = pyqtSignal(object)
@@ -24,9 +26,10 @@ class HistoryLoaderThread(QThread):
       self.error_occurred.emit(f"Failed to load History: {e}")
 
 class HistoryUI(QWidget):
-  def __init__(self):
+  def __init__(self, tab_widget):
     super().__init__()
     self.main_layout = QVBoxLayout(self)
+    self.tab_widget = tab_widget
 
     self.form_layout = QFormLayout()
     self.group_box = QGroupBox("Here is the history of your downloads:")
@@ -44,6 +47,6 @@ class HistoryUI(QWidget):
 
   def populate_history(self, history):
     for index, item in enumerate(history.history):
-      url_label = QLabel(item['url'])
-      date_label = QLabel(item['timestamp'])
-      self.form_layout.addRow(url_label, date_label)
+      row = HistoryItemUI(self.tab_widget, item, history.delete_from_history)
+      self.form_layout.addRow(row)
+
