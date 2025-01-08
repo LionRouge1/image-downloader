@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, QLabel, QWidget
 from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt
 from app.gui.home import HomeWindow
 from app.gui.setting import SettingsUI
 from app.gui.history import HistoryUI
@@ -35,12 +36,13 @@ class AboutWindow(QWidget):
         "Image Downloader is an open-source application created by Matchoudi Avlessi, a software engineer. "
         "This application allows users to download images from various sources efficiently and manage their download history."
     )
-    description.setMaximumWidth(400)
     description.setWordWrap(True)
+    description.setStyleSheet("font-size: 18px; font-family: Arial; padding: 100px;")
+    description.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    description.setFixedHeight(300)
     layout = QVBoxLayout()
     layout.addWidget(description)
     self.setLayout(layout)
-
 
 # Main entry point
 if __name__ == "__main__":

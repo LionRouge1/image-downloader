@@ -50,7 +50,6 @@ class HomeWindow(QWidget):
     if url:
       self.search_btn.setDisabled(True)
       try:
-
         images = ImagesWindow(url)
         self.main_layout.addWidget(images)
 

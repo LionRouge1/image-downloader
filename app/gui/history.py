@@ -1,4 +1,4 @@
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread, pyqtSignal, Qt
 from PyQt6.QtWidgets import (
   QWidget,
   QVBoxLayout,
@@ -6,11 +6,12 @@ from PyQt6.QtWidgets import (
   QFormLayout,
   QGroupBox,
   QPushButton,
-  QMessageBox
+  QMessageBox,
+  QHBoxLayout,
+  QLabel
 )
 from ..core.history import History
 from .history_item import HistoryItemUI
-from .view_history import ViewHistoryUI
 
 class HistoryLoaderThread(QThread):
   history_loaded = pyqtSignal(object)
@@ -34,7 +35,7 @@ class HistoryUI(QWidget):
     self.history = None
 
     self.form_layout = QFormLayout()
-    self.group_box = QGroupBox("Here is the history of your downloads:")
+    self.group_box = QGroupBox("Here is the history of your downloads")
     self.group_box.setLayout(self.form_layout)
 
     self.clear_button = QPushButton("Clear History")
@@ -59,6 +60,24 @@ class HistoryUI(QWidget):
       child = self.form_layout.takeAt(0)
       if child.widget():
         child.widget().deleteLater()
+    # Add headers for the history
+    header_widget = QWidget()
+    header_layout = QHBoxLayout(header_widget)
+    button_style = "font-size: 18px; font-family: Arial; font-weight: bold; padding: 5px; border: 1px solid #ccc;"
+    website_button = QLabel("Website URL")
+    website_button.setStyleSheet(button_style)
+    website_button.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    date_button = QLabel("Date")
+    date_button.setStyleSheet(button_style)
+    date_button.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    actions_button = QLabel("Actions")
+    actions_button.setStyleSheet(button_style)
+    actions_button.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+    header_layout.addWidget(website_button)
+    header_layout.addWidget(date_button)
+    header_layout.addWidget(actions_button)
+    self.form_layout.addRow(header_widget)
 
     for index, item in enumerate(history.get_histories()):
       row = HistoryItemUI(self.tab_widget, item, history)
@@ -81,4 +100,3 @@ class HistoryUI(QWidget):
         if child.widget():
           child.widget().deleteLater()
       self.populate_history(self.history)
-

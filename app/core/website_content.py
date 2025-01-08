@@ -1,5 +1,6 @@
 import requests
 from urllib.parse import urlparse, urljoin
+from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import re
 from .setting import load_settings
@@ -14,6 +15,44 @@ class Content():
     self.netloc = urlparse(url).netloc
     self.path = urlparse(url).path
     self.query = urlparse(url).query
+
+  def scrape_images(self):
+    with sync_playwright() as p:
+      browser = p.chromium.launch(headless=True)
+      page = browser.new_page()
+      page.goto(self.url)
+      page.wait_for_load_state("domcontentloaded")
+      images = page.query_selector_all("img")[:self.max_images]
+      self.image_urls = [self.reconstruct_url(img.get_attribute("src")) for img in images if img.get_attribute("src")]
+
+      if self.settings['get_css_images'] and len(self.image_urls) < self.max_images:
+        max = self.max_images - len(images)
+        css_images = page.evaluate('''(max) => {
+          const images = [];
+          for (const sheet of document.styleSheets) {
+            try {
+              for (const rule of sheet.cssRules) {
+                if (rule.style && rule.style.backgroundImage) {
+                  const match = rule.style.backgroundImage.match(/url\\(['"]?([^'"]+)['"]?\\)/);
+                  if (match) {
+                    if (images.length >= max) { break; }
+                    if (match[1].startsWith('/') || match[1].startsWith('http') || match[1].startsWith('//')) {
+                      images.push(match[1]);
+                    }
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn("Could not access stylesheet:", e);
+            }
+          }
+          return images;
+        }''', max)
+
+      self.image_urls += [self.reconstruct_url(img) for img in css_images if img]
+      browser.close()
+
+      return self.image_urls
     
   def get_content(self):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
@@ -35,6 +74,7 @@ class Content():
     
   def get_images(self):
     content = self.get_content()
+
     if content:
       images = content.find_all('img')[:self.max_images]
       self.image_urls = [self.reconstruct_url(img['src']) for img in images if img.get('src')]

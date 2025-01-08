@@ -25,7 +25,7 @@ class ImagesLoaderThread(QThread):
   def run(self):
     try:
       web_content = Content(self.url)
-      images_url = web_content.get_images()
+      images_url = web_content.scrape_images()
 
       if images_url:
         self.urls_loaded.emit(images_url)
