@@ -14,12 +14,18 @@ class History:
 
   def add_to_history(self, url, images=[]):
     website = {
-      "id": len(self.histories) + 1,
+      "id": 1,
       "url": url,
       "images": images,
       "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
-    self.histories.insert(0, website)
+    histories = [website]
+    # self.histories.insert(0, website)
+    for index, website in enumerate(self.histories):
+      if website['url'] != url:
+        website['id'] = index + 2
+        histories.append(website)
+    self.histories = histories
     self.save_history()
 
   def save_history(self):
@@ -27,14 +33,18 @@ class History:
       json.dump(self.histories, json_file, indent=2)
 
   def delete_from_history(self, website_id):
-    histories = []
+    self.histories = [website for website in self.histories if website['id'] != website_id]
     for index, website in enumerate(self.histories):
-      if website['id'] != website_id:
-        website['id'] = index + 1
-        histories.append(website)
+      website['id'] = index + 1
 
-    self.histories = histories
     self.save_history()
+
+  # def update_histories(self, count):
+  #   histories = []
+  #   for index, website in enumerate(self.histories):
+  #     if website['id'] != website_id:
+  #       website['id'] = index + 1
+  #       histories.append(website)
 
   def clear_history(self):
     self.histories = []
@@ -50,14 +60,20 @@ class History:
       
   def view_history(self, website_id):
     history = self.get_history(website_id)
-    history['id'] = 1
-    histories = [history]
-    # self.histories = [website for website in self.histories if website['id'] != website_id]
-    for index, website in enumerate(self.histories):
-      if website['id'] != website_id:
-        website['id'] = index + 1
-        histories.append(website)
-    self.save_history()
+    if history:
+      history = {
+        "id": 1,
+        "url": history['url'],
+        "images": history['images'],
+        "timestamp": history['timestamp']
+      }
+      histories = [history]
+      for index, website in enumerate(self.histories):
+        if website['id'] != website_id:
+          website['id'] = index + 2
+          histories.append(website)
+      self.histories = histories
+      self.save_history()
 
 
   def get_history_count(self):

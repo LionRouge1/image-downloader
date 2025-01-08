@@ -38,6 +38,8 @@ class ImagesLoaderThread(QThread):
 class ImagesWindow(QWidget):
   def __init__(self, url):
     super().__init__()
+    # self.setWindowTitle("Image Downloader")
+    # self.setGeometry(100, 100, 800, 600)
     self.url = url
     self.history = History()
     self.images = []

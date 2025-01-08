@@ -14,8 +14,7 @@ from .utils import show_error_message
 class HomeWindow(QWidget):
   def __init__(self):
     super().__init__()
-    self.main_layout = QVBoxLayout()
-    self.setLayout(self.main_layout)
+    self.main_layout = QVBoxLayout(self)
 
     search_label = QLabel("Enter Website URL:")
     self.url_input = QLineEdit()
@@ -24,6 +23,7 @@ class HomeWindow(QWidget):
     self.url_input.setValidator(validator)
     self.url_input.setPlaceholderText("https://www.example.com")
     self.url_input.setStyleSheet("height: 20px; padding: 10px")
+    self.url_input.setFixedWidth(400)
     self.url_input.setMaximumWidth(400)
 
     self.search_btn = QPushButton("Search")
@@ -47,15 +47,16 @@ class HomeWindow(QWidget):
 
   def show_images(self):
     url = self.url_input.text()
-    self.search_btn.setDisabled(True)
-    try:
+    if url:
+      self.search_btn.setDisabled(True)
+      try:
 
-      images = ImagesWindow(url)
-      self.main_layout.addWidget(images)
+        images = ImagesWindow(url)
+        self.main_layout.addWidget(images)
 
-    except Exception as e:
-      print("Error:", e)
-      show_error_message(str(e))
-    finally:
-      self.search_btn.setDisabled(False)
-      self.url_input.clear()
+      except Exception as e:
+        print("Error:", e)
+        show_error_message(str(e))
+      finally:
+        self.search_btn.setDisabled(False)
+        self.url_input.clear()

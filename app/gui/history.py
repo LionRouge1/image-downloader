@@ -54,6 +54,12 @@ class HistoryUI(QWidget):
 
   def populate_history(self, history):
     self.history = history
+    # Clear the form layout before populating to avoid duplicates
+    while self.form_layout.count():
+      child = self.form_layout.takeAt(0)
+      if child.widget():
+        child.widget().deleteLater()
+
     for index, item in enumerate(history.get_histories()):
       row = HistoryItemUI(self.tab_widget, item, history)
       self.form_layout.addRow(row)
@@ -70,6 +76,9 @@ class HistoryUI(QWidget):
     if confirmation == QMessageBox.StandardButton.Yes:
 
       self.history.clear_history()
-      self.form_layout.deleteLater()
+      while self.form_layout.count():
+        child = self.form_layout.takeAt(0)
+        if child.widget():
+          child.widget().deleteLater()
       self.populate_history(self.history)
 
