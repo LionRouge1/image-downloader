@@ -3,13 +3,14 @@ from PyQt6.QtCore import Qt
 from .image import ImageWidget
 
 class ViewHistoryUI(QWidget):
-  def __init__(self, tab_widget, history, callback):
+  def __init__(self, tab_widget, history, callback, settings):
     super().__init__()
     self.tab_widget = tab_widget
     self.close_existing_tab()
     callback(history['id'])
     
     self.images = []
+    self.settings = settings
     self.tab_widget.addTab(self, "View History")
     self.tab_widget.setCurrentWidget(self)
     self.main_layout = QVBoxLayout(self)

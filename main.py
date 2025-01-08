@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
     self.tabs.addTab(HomeWindow(self.settings), "Home")
     self.tabs.addTab(AboutWindow(), "About")
     self.tabs.addTab(SettingsUI(self.settings), "Settings")
-    self.history_tab = HistoryUI(self.tabs)
+    self.history_tab = HistoryUI(self.tabs, self.settings)
     self.tabs.addTab(self.history_tab, "History")
     self.tabs.currentChanged.connect(self.__on_tab_change)
     self.setCentralWidget(self.tabs)

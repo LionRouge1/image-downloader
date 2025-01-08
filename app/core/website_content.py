@@ -3,8 +3,6 @@ from urllib.parse import urlparse, urljoin
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import re
-# from main import MainWindow
-# from .settings import load_settings
 
 class Content:
   def __init__(self, url, settings):

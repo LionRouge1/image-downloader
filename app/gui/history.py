@@ -28,11 +28,12 @@ class HistoryLoaderThread(QThread):
       self.error_occurred.emit(f"Failed to load History: {e}")
 
 class HistoryUI(QWidget):
-  def __init__(self, tab_widget):
+  def __init__(self, tab_widget, settings):
     super().__init__()
     self.main_layout = QVBoxLayout(self)
     self.tab_widget = tab_widget
     self.history = None
+    self.settings = settings
 
     self.form_layout = QFormLayout()
     self.group_box = QGroupBox("Here is the history of your downloads")
@@ -81,7 +82,7 @@ class HistoryUI(QWidget):
     self.form_layout.addRow(header_widget)
 
     for index, item in enumerate(history.get_histories()):
-      row = HistoryItemUI(self.tab_widget, item, history)
+      row = HistoryItemUI(self.tab_widget, item, history, self.settings)
       self.form_layout.addRow(row)
 
   def clear_history(self):

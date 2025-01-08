@@ -3,11 +3,11 @@ from PyQt6.QtCore import Qt
 from .view_history import ViewHistoryUI
 
 class HistoryItemUI(QWidget):
-  def __init__(self, tab, history, history_object):
+  def __init__(self, tab, history, history_object, settings):
     super().__init__()
     self.layout = QHBoxLayout(self)
     self.tab_widget = tab
-        
+    # self.settings = settings
     self.label_url = QLabel(history['url'])
     self.label_url.setWordWrap(True)
     self.label_url.setStyleSheet("font-size: 16px; font-family: Arial")
@@ -15,7 +15,7 @@ class HistoryItemUI(QWidget):
     self.label_date.setStyleSheet("font-size: 16px; font-family: Arial")
 
     view_button = QPushButton("View")
-    view_button.clicked.connect(lambda _, tab=self.tab_widget, ht=history, obj = history_object: self.update_history_tab(tab, ht, obj))
+    view_button.clicked.connect(lambda _, tab=self.tab_widget, ht=history, obj = history_object, set=settings: self.update_history_tab(tab, ht, obj, set))
     view_button.setStyleSheet("background: green; color: white; padding: 8px")
     view_button.setCursor(Qt.CursorShape.PointingHandCursor)
     view_button.setFixedWidth(80)
@@ -31,8 +31,8 @@ class HistoryItemUI(QWidget):
     self.layout.addWidget(view_button)
     self.layout.addWidget(delete_button)
 
-  def update_history_tab(self, tab, history, object):
-    ViewHistoryUI(tab, history, object.view_history)
+  def update_history_tab(self, tab, history, object, setting):
+    ViewHistoryUI(tab, history, object.view_history, setting)
 
   def delete_history(self, id, callback):
     callback(id)

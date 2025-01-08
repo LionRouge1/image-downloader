@@ -26,7 +26,7 @@ class ImagesLoaderThread(QThread):
   def run(self):
     try:
       web_content = Content(self.url, self.settings)
-      images_url = web_content.scrape_images()
+      images_url = web_content.scrape_images() if self.settings.simulate else web_content.get_images()
 
       if images_url:
         self.urls_loaded.emit(images_url)
@@ -34,13 +34,11 @@ class ImagesLoaderThread(QThread):
         self.error_occurred.emit("No images found on the website.")
     except Exception as e:
       # show_error_message(f"Failed to load images: {e}")
-      self.error_occurred.emit(f"Failed to load Website content: {e}")
+      self.error_occurred.emit(f"Failed to load Website content")
 
 class ImagesWindow(QWidget):
   def __init__(self, url, settings):
     super().__init__()
-    # self.setWindowTitle("Image Downloader")
-    # self.setGeometry(100, 100, 800, 600)
     self.settings = settings
     self.url = url
     self.history = History()

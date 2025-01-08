@@ -39,13 +39,6 @@ class History:
 
     self.save_history()
 
-  # def update_histories(self, count):
-  #   histories = []
-  #   for index, website in enumerate(self.histories):
-  #     if website['id'] != website_id:
-  #       website['id'] = index + 1
-  #       histories.append(website)
-
   def clear_history(self):
     self.histories = []
     self.save_history()
@@ -65,7 +58,7 @@ class History:
         "id": 1,
         "url": history['url'],
         "images": history['images'],
-        "timestamp": history['timestamp']
+        "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
       }
       histories = [history]
       for index, website in enumerate(self.histories):

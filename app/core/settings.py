@@ -44,7 +44,7 @@ class Settings:
     self.save_directory = self.default_directory
     self.image_format = ''
     self.max_images = 50
-    self.get_css_images = True
+    self.get_css_images = False
     self.simulate = False
     self.load_settings()
 
@@ -74,15 +74,6 @@ class Settings:
     else:
       raise ValueError("Invalid image format. Choose from 'jpg', 'png', 'gif'.")
 
-  def update_max_images(self, new_max):
-    if isinstance(new_max, int) and new_max > 0:
-      self.max_images = new_max
-    else:
-      raise ValueError("Max images must be a positive integer.")
-    
-  def enable_css_images(self):
-    self.get_css_images = True
-
   def get_download_folder(self):
     """Get the default Downloads folder for the current OS."""
     if os.name == 'nt':  # Windows
@@ -98,7 +89,7 @@ class Settings:
       'image_format': self.image_format,
       'max_images': max_images,
       'get_css_images': get_css_images,
-      'stimuli': self.simulate
+      'simulate': simulate
     }
     with open('settings.json', 'w') as json_file:
       json.dump(settings_dict, json_file, indent=2)
