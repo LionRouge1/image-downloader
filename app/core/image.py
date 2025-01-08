@@ -6,23 +6,25 @@ from decimal import Decimal
 import cairosvg
 import re
 import os
-from .setting import load_settings
+# from main import MainWindow
+# from .settings import load_settings
 
 class ImageDataError(Exception):
   pass
 
-class ImageData:
-  def __init__(self, url):
+class ImageData():
+  def __init__(self, url, settings):
+    super().__init__()
     self.url = url
     self.path = urlparse(url).path
     self.scheme = urlparse(url).scheme
-
+    self.settings = settings
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
     self.response = requests.get(url, headers=headers)
     self.response.raise_for_status
     self.filename = self.image_name()
     self.image_name_without_extension = self.filename.split('.')[0]
-    self.file_directory = load_settings()['save_directory']
+    self.file_directory = self.settings.save_directory
     # self.output_path = os.path.join(self.file_directory, self.filename)
     
     self.image_data = BytesIO(self.response.content)
@@ -97,7 +99,7 @@ class ImageData:
       raise ImageDataError(f"Failed to display image: {e}")
     
   def save_image(self, format):
-      file_directory = load_settings()['save_directory']
+      file_directory = self.settings.save_directory
       if not os.path.exists(file_directory):
         os.makedirs(file_directory, exist_ok=True)
       output_path = os.path.join(file_directory, self.filename)

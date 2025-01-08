@@ -3,14 +3,15 @@ from urllib.parse import urlparse, urljoin
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import re
-from .setting import load_settings
+# from main import MainWindow
+# from .settings import load_settings
 
-class Content():
-  def __init__(self, url):
+class Content:
+  def __init__(self, url, settings):
     self.url = url
     self.image_urls = []
-    self.settings = load_settings()
-    self.max_images = int(self.settings['max_images'])
+    self.settings = settings
+    self.max_images = int(self.settings.max_images)
     self.scheme = urlparse(url).scheme
     self.netloc = urlparse(url).netloc
     self.path = urlparse(url).path
@@ -21,11 +22,11 @@ class Content():
       browser = p.chromium.launch(headless=True)
       page = browser.new_page()
       page.goto(self.url)
-      page.wait_for_load_state("domcontentloaded")
+      page.wait_for_load_state(state="domcontentloaded", timeout=6000)
       images = page.query_selector_all("img")[:self.max_images]
       self.image_urls = [self.reconstruct_url(img.get_attribute("src")) for img in images if img.get_attribute("src")]
 
-      if self.settings['get_css_images'] and len(self.image_urls) < self.max_images:
+      if self.settings.get_css_images and len(self.image_urls) < self.max_images:
         max = self.max_images - len(images)
         css_images = page.evaluate('''(max) => {
           const images = [];
@@ -49,7 +50,7 @@ class Content():
           return images;
         }''', max)
 
-      self.image_urls += [self.reconstruct_url(img) for img in css_images if img]
+        self.image_urls += [self.reconstruct_url(img) for img in css_images if img]
       browser.close()
 
       return self.image_urls
@@ -79,7 +80,7 @@ class Content():
       images = content.find_all('img')[:self.max_images]
       self.image_urls = [self.reconstruct_url(img['src']) for img in images if img.get('src')]
 
-      if self.settings['get_css_images'] and len(self.image_urls) < self.max_images:
+      if self.settings.get_css_images and len(self.image_urls) < self.max_images:
         css_files = content.find_all('link', rel='stylesheet')
         for css_file in css_files:
           css_url = self.reconstruct_url(css_file['href'])

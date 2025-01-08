@@ -18,13 +18,14 @@ class ImagesLoaderThread(QThread):
   urls_loaded = pyqtSignal(list)
   error_occurred = pyqtSignal(str)
 
-  def __init__(self, url):
+  def __init__(self, url, settings):
     super().__init__()
     self.url = url
+    self.settings = settings
 
   def run(self):
     try:
-      web_content = Content(self.url)
+      web_content = Content(self.url, self.settings)
       images_url = web_content.scrape_images()
 
       if images_url:
@@ -36,10 +37,11 @@ class ImagesLoaderThread(QThread):
       self.error_occurred.emit(f"Failed to load Website content: {e}")
 
 class ImagesWindow(QWidget):
-  def __init__(self, url):
+  def __init__(self, url, settings):
     super().__init__()
     # self.setWindowTitle("Image Downloader")
     # self.setGeometry(100, 100, 800, 600)
+    self.settings = settings
     self.url = url
     self.history = History()
     self.images = []
@@ -87,7 +89,7 @@ class ImagesWindow(QWidget):
 
     layout.addWidget(self.loading_widget)
 
-    self.thread = ImagesLoaderThread(url)
+    self.thread = ImagesLoaderThread(url, settings)
     self.thread.urls_loaded.connect(self.display_images)
     self.thread.error_occurred.connect(self.display_error_message)
     self.thread.start()

@@ -15,13 +15,14 @@ class ImageThread(QThread):
   image_downloaded = pyqtSignal(object)
   thread_finished = pyqtSignal(bool)
 
-  def __init__(self, url):
+  def __init__(self, url, settings):
     super().__init__()
     self.url = url
+    self.settings = settings
 
   def run(self):
     try:
-      image = ImageData(self.url)
+      image = ImageData(self.url, self.settings)
       self.image_downloaded.emit(image)
     except Exception as e:
       self.thread_finished.emit(False)
@@ -36,7 +37,7 @@ class ImageWidget(QWidget):
     self.setLayout(self.image_box_layout)
     self.setMaximumWidth(250)
     self.image = None
-    self.thread = ImageThread(self.url)
+    self.thread = ImageThread(self.url, parent.settings)
     self.thread.image_downloaded.connect(self.add_image)
     self.thread.thread_finished.connect(self.on_thread_finished)
     self.thread.start()

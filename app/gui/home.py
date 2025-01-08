@@ -12,10 +12,10 @@ from .images import ImagesWindow
 from .utils import show_error_message
 
 class HomeWindow(QWidget):
-  def __init__(self):
+  def __init__(self, settings):
     super().__init__()
     self.main_layout = QVBoxLayout(self)
-
+    self.settings = settings
     search_label = QLabel("Enter Website URL:")
     self.url_input = QLineEdit()
     url_regex = QRegularExpression(r"^(https?|ftp)://[^\s/$.?#].[^\s]*$")
@@ -50,7 +50,7 @@ class HomeWindow(QWidget):
     if url:
       self.search_btn.setDisabled(True)
       try:
-        images = ImagesWindow(url)
+        images = ImagesWindow(url, self.settings)
         self.main_layout.addWidget(images)
 
       except Exception as e:

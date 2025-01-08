@@ -2,6 +2,7 @@ import sys
 from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, QLabel, QWidget
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
+from app.core.settings import Settings
 from app.gui.home import HomeWindow
 from app.gui.setting import SettingsUI
 from app.gui.history import HistoryUI
@@ -10,21 +11,22 @@ class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
     self.setWindowTitle("Image Downloader")
+    self.settings = Settings()
 
     icon_path = "/home/crowdfrica/Matchoudi/image-downloader/app/gui/assets/logo.png"
     icon = QIcon(icon_path)
     self.setWindowIcon(icon)
     self.tabs = QTabWidget()
 
-    self.tabs.addTab(HomeWindow(), "Home")
+    self.tabs.addTab(HomeWindow(self.settings), "Home")
     self.tabs.addTab(AboutWindow(), "About")
-    self.tabs.addTab(SettingsUI(), "Settings")
+    self.tabs.addTab(SettingsUI(self.settings), "Settings")
     self.history_tab = HistoryUI(self.tabs)
     self.tabs.addTab(self.history_tab, "History")
-    self.tabs.currentChanged.connect(self.on_tab_change)
+    self.tabs.currentChanged.connect(self.__on_tab_change)
     self.setCentralWidget(self.tabs)
 
-  def on_tab_change(self, index):
+  def __on_tab_change(self, index):
     if self.tabs.tabText(index) == "History":
       self.history_tab.thread.start()
 

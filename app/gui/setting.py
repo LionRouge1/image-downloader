@@ -3,12 +3,12 @@ from PyQt6.QtGui import QIntValidator
 from PyQt6.QtWidgets import (
   QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox, QFileDialog, QGridLayout, QGroupBox
 )
-from ..core.setting import save_settings, load_settings
+# from ..core.settings import save_settings, load_settings
 
 class SettingsUI(QWidget):
-  def __init__(self):
+  def __init__(self, settings):
     super().__init__()
-    self.settings = load_settings()
+    self.settings = settings
     layout = QVBoxLayout(self)
     self.setFixedHeight(400)
     params_layout = QGridLayout()
@@ -25,7 +25,7 @@ class SettingsUI(QWidget):
     self.dir_line_edit = QLineEdit(self)
     self.dir_line_edit.setStyleSheet("padding: 10px")
     params_layout.addWidget(self.dir_line_edit, 0, 1)
-    self.dir_line_edit.setText(self.settings['save_directory'])
+    self.dir_line_edit.setText(self.settings.save_directory)
     self.dir_line_edit.setReadOnly(True)
 
     self.dir_button = QPushButton('Browse', self)
@@ -41,7 +41,7 @@ class SettingsUI(QWidget):
     self.max_image_line_edit = QLineEdit(self)
     self.max_image_line_edit.setStyleSheet("padding: 10px")
     self.max_image_line_edit.setValidator(QIntValidator(2, 999, self))
-    self.max_image_line_edit.setText(str(self.settings['max_images']))
+    self.max_image_line_edit.setText(str(self.settings.max_images))
     self.max_image_line_edit.textChanged.connect(self.save_setting)
     params_layout.addWidget(self.max_image_line_edit, 1, 1)
 
@@ -60,7 +60,7 @@ class SettingsUI(QWidget):
     params_layout.addWidget(self.enable_css_images_label, 3, 0)
     
     self.css_checkbox = QCheckBox(self)
-    self.css_checkbox.setChecked(self.settings['get_css_images'])
+    self.css_checkbox.setChecked(self.settings.get_css_images)
     self.css_checkbox.setStyleSheet('''
       QCheckBox::indicator {
       width: 15px;
@@ -101,4 +101,4 @@ class SettingsUI(QWidget):
     max = self.max_image_line_edit.text()
     get_css = self.css_checkbox.isChecked()
 
-    save_settings(directory, max, get_css)
+    self.settings.save_settings(directory, max, get_css)
