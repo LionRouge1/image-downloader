@@ -2,6 +2,6 @@
   "save_directory": "/home/crowdfrica/Downloads/downloader_images",
   "image_format": "jpg",
   "max_images": "100",
-  "get_css_images": true,
+  "get_css_images": false,
   "simulate": false
 }

@@ -2,42 +2,6 @@ import os
 from pathlib import Path
 import json
 
-# def get_download_folder():
-#   """Get the default Downloads folder for the current OS."""
-#   if os.name == 'nt':  # Windows
-#     return str(Path.home() / "Downloads")
-#   elif os.name == 'posix':  # macOS or Linux
-#     return str(Path.home() / "Downloads")
-#   else:
-#     raise NotImplementedError("OS not supported")
-
-# def load_settings():
-#   default_directory = os.path.join(get_download_folder(), "downloader_images")
-#   settings = {
-#     'save_directory': default_directory,
-#     'image_format': 'jpg',
-#     'max_images': 50,
-#     'get_css_images': False
-#   }
-#   if os.path.exists('settings.json'):
-#     with open('settings.json', 'r') as json_file:
-#       settings_dict = json.load(json_file)
-#       settings['save_directory'] = settings_dict.get('save_directory', default_directory)
-#       settings['image_format'] = settings_dict.get('image_format', 'jpg')
-#       settings['max_images'] = settings_dict.get('max_images', 50)
-#       settings['get_css_images'] = settings_dict.get('get_css_images', False)
-#   return settings
-
-# def save_settings(new_directory, max_images, get_css_images):
-#   settings_dict = {
-#     'save_directory': new_directory,
-#     'image_format': 'jpg',
-#     'max_images': max_images,
-#     'get_css_images': get_css_images
-#   }
-#   with open('settings.json', 'w') as json_file:
-#     json.dump(settings_dict, json_file, indent=2)
-
 class Settings:
   def __init__(self):
     self.default_directory = os.path.join(self.get_download_folder(), "downloader_images")

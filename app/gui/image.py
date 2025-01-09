@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
   QComboBox
 )
 from ..core.image import ImageData
-from .utils import show_success_message, show_custom_error_message
+from .utils import show_success_message, show_error_message
 
 class ImageThread(QThread):
   image_downloaded = pyqtSignal(object)
@@ -112,7 +112,8 @@ class ImageWidget(QWidget):
 
   def save_image(self):
     selected_format = self.format_combo.currentText()
-    self.image.save_image(selected_format)
-
-    show_success_message("Image has been successfully downloaded.")
-
+    try:
+      self.image.save_image(selected_format)
+      show_success_message(f"Image has been successfully downloaded to {self.parent.settings.save_directory}")
+    except Exception as e:
+      show_error_message(str(e))

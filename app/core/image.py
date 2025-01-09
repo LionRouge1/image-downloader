@@ -107,8 +107,6 @@ class ImageData():
         match format:
           case 'PNG':
             self.save_svg_to_png()
-          case 'JPEG':
-            self.save_svg_to_jpeg()
           case 'WEBP':
             self.save_svg_to_webp()
           case _:
@@ -116,5 +114,6 @@ class ImageData():
               f.write(self.image_data.getvalue())
       else:
         image_format = format or self.format
+        if image_format.upper() == 'JPEG' and self.image.mode in ['RGBA', 'P']:
+            self.image = self.image.convert('RGB')
         self.image.save(self.output_path(image_format), format=image_format, quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
-    

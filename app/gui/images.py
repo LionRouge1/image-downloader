@@ -122,5 +122,5 @@ class ImagesWindow(QWidget):
       if image:
         image.save_image()
     
-    show_success_message('All images have been successfully downloaded.')
+    show_success_message(f"All images have been successfully downloaded to {self.settings.save_directory}")
     self.download_all.setDisabled(False)
