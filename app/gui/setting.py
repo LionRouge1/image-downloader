@@ -14,7 +14,7 @@ class SettingsUI(QWidget):
     params_layout = QGridLayout()
 
     group_box = QGroupBox("Settings")
-    group_box.setFixedSize(600, 350)
+    group_box.setFixedSize(600, 400)
     group_box.setLayout(params_layout)
 
     # Directory selection
@@ -107,6 +107,35 @@ class SettingsUI(QWidget):
     ''')
     params_layout.addWidget(self.browser_description_label, 6, 1)
 
+    # Show browser when stimulating
+    self.show_browser_label = QLabel('Show Browser:')
+    self.show_browser_label.setDisabled(not self.settings.simulate)
+    self.show_browser_label.setStyleSheet("font-size: 16px; font-family: Arial;")
+    self.show_browser_label.mousePressEvent = lambda event: self.show_browser_checkbox.toggle()
+    params_layout.addWidget(self.show_browser_label, 7, 0)
+
+    self.show_browser_checkbox = QCheckBox(self)
+    self.show_browser_checkbox.setDisabled(not self.settings.simulate)
+    self.show_browser_checkbox.setChecked(self.settings.show_browser)
+    self.show_browser_checkbox.setStyleSheet('''
+      QCheckBox::indicator {
+      width: 15px;
+      height: 15px;
+      padding: 5px
+      };
+    ''')
+    self.show_browser_checkbox.stateChanged.connect(self.save_setting)
+    params_layout.addWidget(self.show_browser_checkbox, 7, 1)
+
+    # Description for show browser checkbox
+    self.show_browser_description_label = QLabel('When checked, the browser will be displayed during simulation. This is useful for websites that block requests from headless browsers.')
+    self.show_browser_description_label.setWordWrap(True)
+    self.show_browser_description_label.setStyleSheet('''
+      color: grey;
+      font-size: 12px;
+    ''')
+    params_layout.addWidget(self.show_browser_description_label, 8, 1)
+
     # Save button
     self.save_button = QPushButton('Save Settings', self)
     self.save_button.setFixedSize(120, 40)
@@ -128,5 +157,8 @@ class SettingsUI(QWidget):
     max = self.max_image_line_edit.text()
     get_css = self.css_checkbox.isChecked()
     simulate = self.browser_checkbox.isChecked()
+    show_browser = self.show_browser_checkbox.isChecked()
+    self.show_browser_checkbox.setDisabled(not simulate)
+    self.show_browser_label.setDisabled(not simulate)
 
-    self.settings.save_settings(directory, max, get_css, simulate)
+    self.settings.save_settings(directory, max, get_css, simulate, show_browser)

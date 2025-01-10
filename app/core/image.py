@@ -42,8 +42,8 @@ class ImageData():
     else:
       self.image = Image.open(self.image_data)
       self.format = self.image.format
-      self.size = self.image.size,
-      self.mode = self.image.mode,
+      self.size = self.image.size
+      self.mode = self.image.mode
   
   def decode_base64_image(self):
     self.response = None

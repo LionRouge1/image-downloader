@@ -10,6 +10,7 @@ class Settings:
     self.max_images = 50
     self.get_css_images = False
     self.simulate = False
+    self.show_browser = False
     self.load_settings()
 
   def load_settings(self):
@@ -21,6 +22,7 @@ class Settings:
         self.max_images = settings_dict.get('max_images', 50)
         self.get_css_images = settings_dict.get('get_css_images', False)
         self.simulate = settings_dict.get('simulate', False)
+        self.show_browser = settings_dict.get('show_browser', False)
 
   def create_save_directory(self):
     if not os.path.exists(self.get_download_folder()):
@@ -47,13 +49,14 @@ class Settings:
     else:
       raise NotImplementedError("OS not supported")
     
-  def save_settings(self, new_directory, max_images, get_css_images, simulate):
+  def save_settings(self, new_directory, max_images, get_css_images, simulate, show_browser):
     settings_dict = {
       'save_directory': new_directory,
       'image_format': self.image_format,
       'max_images': max_images,
       'get_css_images': get_css_images,
-      'simulate': simulate
+      'simulate': simulate,
+      'show_browser': show_browser
     }
     with open('settings.json', 'w') as json_file:
       json.dump(settings_dict, json_file, indent=2)

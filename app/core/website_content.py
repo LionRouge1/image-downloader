@@ -10,6 +10,7 @@ class Content:
     self.image_urls = []
     self.settings = settings
     self.max_images = int(self.settings.max_images)
+    self.show_browser = self.settings.show_browser
     self.scheme = urlparse(url).scheme
     self.netloc = urlparse(url).netloc
     self.path = urlparse(url).path
@@ -17,7 +18,7 @@ class Content:
 
   def scrape_images(self):
     with sync_playwright() as p:
-      browser = p.chromium.launch(headless=False)
+      browser = p.chromium.launch(headless= not self.show_browser)
       page = browser.new_page()
       page.goto(self.url)
       page.wait_for_load_state(state="domcontentloaded", timeout=6000)
@@ -50,13 +51,6 @@ class Content:
       browser.close()
 
       return self.image_urls
-    
-  def get_content(self):
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-    response = requests.get(self.url, headers=headers)
-    response.raise_for_status()
-  
-    return BeautifulSoup(response.text, 'html.parser')
 
   def reconstruct_url(self, src):
     if src.startswith('//'):
@@ -70,7 +64,16 @@ class Content:
     return bool(re.match(r"^(https?|ftp)://[^\s/$.?#].[^\s]*$", url))
     
   def get_images(self):
-    content = self.get_content()
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    response = requests.get(self.url, headers=headers)
+    content_type = response.headers.get('Content-Type')
+    response.raise_for_status()
+
+    if 'image' in content_type:
+      return [self.url]
+    
+    content = BeautifulSoup(response.text, 'html.parser')
+    
 
     if content:
       images = content.find_all('img')[:self.max_images]
