@@ -30,6 +30,7 @@ class HistoryLoaderThread(QThread):
 class HistoryUI(QWidget):
   def __init__(self, tab_widget, settings):
     super().__init__()
+    self.setMinimumWidth(700)
     self.main_layout = QVBoxLayout(self)
     self.tab_widget = tab_widget
     self.history = None

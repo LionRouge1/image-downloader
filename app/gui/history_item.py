@@ -7,11 +7,13 @@ class HistoryItemUI(QWidget):
     super().__init__()
     self.layout = QHBoxLayout(self)
     self.tab_widget = tab
-    # self.settings = settings
     self.label_url = QLabel(history['url'])
     self.label_url.setWordWrap(True)
+    self.label_url.setFixedWidth(250)
+    self.label_url.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
     self.label_url.setStyleSheet("font-size: 16px; font-family: Arial")
     self.label_date = QLabel(history['timestamp'])
+    self.label_date.setAlignment(Qt.AlignmentFlag.AlignCenter)
     self.label_date.setStyleSheet("font-size: 16px; font-family: Arial")
 
     view_button = QPushButton("View")

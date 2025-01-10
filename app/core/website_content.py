@@ -17,7 +17,7 @@ class Content:
 
   def scrape_images(self):
     with sync_playwright() as p:
-      browser = p.chromium.launch(headless=True)
+      browser = p.chromium.launch(headless=False)
       page = browser.new_page()
       page.goto(self.url)
       page.wait_for_load_state(state="domcontentloaded", timeout=6000)
@@ -35,9 +35,7 @@ class Content:
                   const match = rule.style.backgroundImage.match(/url\\(['"]?([^'"]+)['"]?\\)/);
                   if (match) {
                     if (images.length >= max) { break; }
-                    if (match[1].startsWith('/') || match[1].startsWith('http') || match[1].startsWith('//')) {
-                      images.push(match[1]);
-                    }
+                    images.push(match[1]);
                   }
                 }
               }
@@ -57,7 +55,7 @@ class Content:
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
     response = requests.get(self.url, headers=headers)
     response.raise_for_status()
-
+  
     return BeautifulSoup(response.text, 'html.parser')
 
   def reconstruct_url(self, src):

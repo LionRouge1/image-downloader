@@ -3,11 +3,10 @@ from urllib.parse import urlparse
 from io import BytesIO
 from PIL import Image
 from decimal import Decimal
+import base64
 import cairosvg
 import re
 import os
-# from main import MainWindow
-# from .settings import load_settings
 
 class ImageDataError(Exception):
   pass
@@ -19,14 +18,20 @@ class ImageData():
     self.path = urlparse(url).path
     self.scheme = urlparse(url).scheme
     self.settings = settings
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-    self.response = requests.get(url, headers=headers)
-    self.response.raise_for_status
+    self.file_directory = self.settings.save_directory
+    
+    if self.url.startswith('data:image'):
+      self.decode_base64_image()
+    else:
+      self.get_image_from_url()
+
     self.filename = self.image_name()
     self.image_name_without_extension = self.filename.split('.')[0]
-    self.file_directory = self.settings.save_directory
-    # self.output_path = os.path.join(self.file_directory, self.filename)
-    
+
+  def get_image_from_url(self):
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+    self.response = requests.get(self.url, headers=headers)
+    self.response.raise_for_status
     self.image_data = BytesIO(self.response.content)
     if self.path.lower().endswith('.svg'):
       self.format = 'SVG'
@@ -39,7 +44,26 @@ class ImageData():
       self.format = self.image.format
       self.size = self.image.size,
       self.mode = self.image.mode,
+  
+  def decode_base64_image(self):
+    self.response = None
+    format = self.get_image_format_from_uri()
+    # print(format)
+    base64_string = self.url.split(",")[1]
+    if format:
+      self.format = format
+      self.image = Image.open(BytesIO(base64.b64decode(base64_string)))
+      self.size = self.image.size
+      self.mode = self.image.mode
+    else:
+      raise ImageDataError("Invalid base64 image format")
 
+  def get_image_format_from_uri(self):
+    match = re.match(r"^data:image/(\w+);base64,", self.url)
+    if match:
+        return match.group(1).upper()
+    return None
+  
   def output_path(self, format):
     return os.path.join(self.file_directory, f"{self.image_name_without_extension}.{format.lower()}")
   
@@ -47,20 +71,23 @@ class ImageData():
     return bool(re.match(r"^[\w\s_()-]+\.[A-Za-z]{3,4}$", name))
 
   def image_name(self):
-    image_name = 'default_name'
-    content_disposition = self.response.headers.get('Content-Disposition')
+    image_name = f"image_{id(self)}"
+    if self.response:
+      content_disposition = self.response.headers.get('Content-Disposition')
+      if content_disposition:
+        filename = re.findall('filename="(.+)"', content_disposition)
+        if filename:
+          image_name = filename[0]
+      elif self.is_valid_image_name(self.path.split('/')[-1]):
+        image_name = self.url.split('/')[-1]
 
-    if content_disposition:
-      filename = re.findall('filename="(.+)"', content_disposition)
-      if filename:
-        image_name = filename[0]
-    elif self.is_valid_image_name(self.path.split('/')[-1]):
-      image_name = self.url.split('/')[-1]
     return image_name
   
   def get_file_size(self):
-    number = Decimal(len(self.response.content) / (1024 * 1024))
-    formatted_number = number.quantize(Decimal("0.001"))
+    formatted_number = "N/A"
+    if self.response:
+      number = Decimal(len(self.response.content) / (1024 * 1024))
+      formatted_number = number.quantize(Decimal("0.001"))
     return formatted_number
   
   def image_properties(self):
@@ -116,4 +143,13 @@ class ImageData():
         image_format = format or self.format
         if image_format.upper() == 'JPEG' and self.image.mode in ['RGBA', 'P']:
             self.image = self.image.convert('RGB')
-        self.image.save(self.output_path(image_format), format=image_format, quality=95, optimize=True, progressive=True, dpi=(300, 300), lossless=True)
+        save_params = {
+            'format': image_format,
+            'quality': 95,
+            'optimize': True,
+            'progressive': True,
+            'dpi': (300, 300)
+        }
+        if image_format.upper() not in ['JPEG', 'GIF']:
+            save_params['lossless'] = True
+        self.image.save(self.output_path(image_format), **save_params)

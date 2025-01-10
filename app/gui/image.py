@@ -78,9 +78,9 @@ class ImageWidget(QWidget):
         case 'SVG':
           image_formats = ["SVG", "PNG", "WEBP"]
         case 'JPEG':
-          image_formats = ["JPEG", "PNG", "WEBP"]
+          image_formats = ["JPEG", "PNG", "WEBP", "BMP", "GIF", "ICO", "TIFF"]
         case _:
-          image_formats = ["", "PNG", "JPEG", "WEBP"]
+          image_formats = ["", "PNG", "JPEG", "WEBP", "BMP", "GIF", "ICO", "TIFF"]
 
       self.format_combo.addItems(image_formats)
       self.format_combo.setCurrentText(self.image_properties['format'])
@@ -102,6 +102,7 @@ class ImageWidget(QWidget):
     self.label.setText(
       f"Failed to load image from: {self.url}"
     )
+    self.label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
     self.image_box_layout.addWidget(self.label)
 
 
