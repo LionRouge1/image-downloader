@@ -48,7 +48,7 @@ class ImageData():
   def decode_base64_image(self):
     self.response = None
     format = self.get_image_format_from_uri()
-    # print(format)
+    
     base64_string = self.url.split(",")[1]
     if format:
       self.format = format
