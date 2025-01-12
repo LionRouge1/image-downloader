@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
     self.setWindowIcon(icon)
     self.tabs = QTabWidget()
 
-    self.tabs.addTab(HomeWindow(self.settings), "Home")
+    self.tabs.addTab(HomeWindow(self.tabs, self.settings), "Home")
     self.tabs.addTab(AboutWindow(), "About")
     self.tabs.addTab(SettingsUI(self.settings), "Settings")
     self.history_tab = HistoryUI(self.tabs, self.settings)

@@ -5,14 +5,14 @@ from .image import ImageWidget
 class ViewHistoryUI(QWidget):
   def __init__(self, tab_widget, history, callback, settings):
     super().__init__()
-    self.tab_widget = tab_widget
+    self.tabs = tab_widget
     self.close_existing_tab()
     callback(history['id'])
     
     self.images = []
     self.settings = settings
-    self.tab_widget.addTab(self, "View History")
-    self.tab_widget.setCurrentWidget(self)
+    self.tabs.addTab(self, "View History")
+    self.tabs.setCurrentWidget(self)
     self.main_layout = QVBoxLayout(self)
 
     close_btn = QPushButton("<-- Close")
@@ -42,7 +42,7 @@ class ViewHistoryUI(QWidget):
 
   def close_existing_tab(self):
         # Find and remove the "Cities" tab
-    for i in range(self.tab_widget.count()):
-      if self.tab_widget.tabText(i) == "View History":
-        self.tab_widget.removeTab(i)
+    for i in range(self.tabs.count()):
+      if self.tabs.tabText(i) == "View History":
+        self.tabs.removeTab(i)
         break

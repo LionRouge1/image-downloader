@@ -27,6 +27,7 @@ class ImageData():
 
     self.filename = self.image_name()
     self.image_name_without_extension = self.filename.split('.')[0]
+    self.file_output_path = self.output_path(self.format)
 
   def get_image_from_url(self):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}

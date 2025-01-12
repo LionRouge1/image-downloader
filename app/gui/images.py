@@ -37,9 +37,10 @@ class ImagesLoaderThread(QThread):
       self.error_occurred.emit(f"Failed to load Website content")
 
 class ImagesWindow(QWidget):
-  def __init__(self, url, settings):
+  def __init__(self, tabs, url, settings):
     super().__init__()
     self.settings = settings
+    self.tabs = tabs
     self.url = url
     self.history = History()
     self.images = []

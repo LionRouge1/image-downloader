@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
   QComboBox
 )
 from ..core.image import ImageData
+from .view_image import ViewImageUI
 from .utils import show_success_message, show_error_message
 
 class ImageThread(QThread):
@@ -32,6 +33,7 @@ class ImageWidget(QWidget):
     super().__init__()
     self.url = url
     self.parent = parent
+    self.tabs = parent.tabs
     self.visibility_state = False
     self.image_box_layout = QVBoxLayout()
     self.setLayout(self.image_box_layout)
@@ -52,6 +54,7 @@ class ImageWidget(QWidget):
       self.image_label = QLabel()
       self.image_label.setPixmap(self.pixmap)
       self.image_label.setScaledContents(True)
+      self.image_label.mousePressEvent = self.on_image_click
       self.toggle_button = QPushButton("Details")
       self.toggle_button.setCursor(Qt.CursorShape.PointingHandCursor)
       self.save_button = QPushButton("Save")
@@ -118,3 +121,7 @@ class ImageWidget(QWidget):
       show_success_message(f"Image has been successfully downloaded to {self.parent.settings.save_directory}")
     except Exception as e:
       show_error_message(str(e))
+
+  def on_image_click(self, event):
+    if self.image:
+      ViewImageUI(self.image, self.tabs)

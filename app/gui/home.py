@@ -12,8 +12,9 @@ from .images import ImagesWindow
 from .utils import show_error_message
 
 class HomeWindow(QWidget):
-  def __init__(self, settings):
+  def __init__(self, tabs, settings):
     super().__init__()
+    self.tabs = tabs
     self.main_layout = QVBoxLayout(self)
     self.settings = settings
     search_label = QLabel("Enter Website URL:")
@@ -50,7 +51,7 @@ class HomeWindow(QWidget):
     if url:
       self.search_btn.setDisabled(True)
       try:
-        images = ImagesWindow(url, self.settings)
+        images = ImagesWindow(self.tabs, url, self.settings)
         self.main_layout.addWidget(images)
 
       except Exception as e:
