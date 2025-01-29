@@ -7,12 +7,14 @@ from PyQt6.QtWidgets import (
   QFileDialog,
   QWidget,
   QSpinBox,
-  QScrollArea
+  QScrollArea,
+  QGraphicsView, QGraphicsScene, QGraphicsPixmapItem,
 )
 from PyQt6.QtCore import Qt
 from PIL import Image, ImageEnhance
 from PIL.ImageQt import ImageQt
 from PyQt6.QtGui import QPixmap
+import sys
 
 class ViewImageUI(QWidget):
   def __init__(self, imageWidget, tabs):
@@ -23,15 +25,19 @@ class ViewImageUI(QWidget):
     self.layout = QVBoxLayout(self)
     self.tabs = tabs
 
-    self.scroll_area = QScrollArea()
-    self.image_label = QLabel()
-    self.scroll_area.setWidget(self.image_label)
-    self.scroll_area.setWidgetResizable(True)
-    self.scroll_area.setFixedHeight(400)
-    self.layout.addWidget(self.scroll_area)
-    self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    # self.scroll_area = QScrollArea()
+    # self.image_label = QLabel()
+    # self.scroll_area.setWidget(self.image_label)
+    # self.scroll_area.setWidgetResizable(True)
+    # self.scroll_area.setFixedHeight(400)
+    # self.layout.addWidget(self.scroll_area)
+    # self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    # QGraphicsView and QGraphicsScene
+    self.graphics_view = QGraphicsView()
+    self.scene = QGraphicsScene()
+    self.graphics_view.setScene(self.scene)
+    self.layout.addWidget(self.graphics_view)
     self.display_image()
-    # self.layout.addWidget(self.image_label)
 
     self.aspect_ratio = self.original_image.width / self.original_image.height
 
@@ -106,6 +112,7 @@ class ViewImageUI(QWidget):
     close_btn.setStyleSheet("background: red; color: white; padding: 10px")
     close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
     self.layout.addWidget(close_btn)
+    # print("Displaying image")
 
   def create_slider(self, label_text):
     """Helper to create a slider with a label."""
@@ -168,9 +175,19 @@ class ViewImageUI(QWidget):
     """Display the current image in the QLabel."""
     qt_image = ImageQt(self.current_image)
     pixmap = QPixmap.fromImage(qt_image)
-    width = self.current_image.width
-    height = self.current_image.height
-    self.image_label.setPixmap(pixmap.scaled(width, height, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+    # width = self.current_image.width
+    # height = self.current_image.height
+    # self.image_label.setPixmap(pixmap.scaled(width, height, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation))
+
+
+    # Add the pixmap to the QGraphicsScene
+    # self.scene.clear()  # Clear previous items
+    self.pixmap_item = QGraphicsPixmapItem(pixmap)
+    self.scene.addItem(self.pixmap_item)
+
+    # Fit the view to the image
+    print(sys.getsizeof(self.pixmap_item))
+    self.graphics_view.fitInView(self.pixmap_item, Qt.AspectRatioMode.KeepAspectRatio)
     # self.image_label.setScaledContents(True)
 
   def update_width(self):
